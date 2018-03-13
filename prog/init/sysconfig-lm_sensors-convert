@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Convert an lm_sensors service configuration file from the old convention
 # (MODULE_0, MODULE_1...) to the new convention (HWMON_MODULES).
@@ -11,7 +11,7 @@
 CONFIG=/etc/sysconfig/lm_sensors
 test -r "$CONFIG" || exit 0
 
-unset ${!MODULE_*} $HWMON_MODULES
+unset "${!MODULE_*}" "$HWMON_MODULES"
 . "$CONFIG"
 test -n "$HWMON_MODULES" && exit 0
 
