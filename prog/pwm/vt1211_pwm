@@ -79,8 +79,8 @@ while getopts di:r:s: opt ; do
 done
 
 [ -z "$action" ] && usage
-[ $nr -lt 1 -o $nr -gt 2 ] && usage
-[ $val -lt 0 -o $val -gt 255 ] && usage
+[ $nr -lt 1 ] || [ $nr -gt 2 ] && usage
+[ $val -lt 0 ] || [ $val -gt 255 ] && usage
 
 # check hwmon device
 dev=$(ls -d /sys/devices/platform/vt1211.*)
