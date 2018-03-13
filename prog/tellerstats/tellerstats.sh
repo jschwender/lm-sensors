@@ -129,7 +129,7 @@ cd "$TEMPPATH" || { echo "could not change directoty to $TEMPPATH"; exit 1; }
 
 # Update primary plots
 GNUPLOTSCRIPT="$TEMPPATH/gnuplotscript"
-cat "$GNUPLOTSCRIPT_TMPL" | perl -p -e's/\$(\w+)/$ENV{$1}/g' > "$GNUPLOTSCRIPT"
+perl -p -e's/\$(\w+)/$ENV{$1}/g' < "$GNUPLOTSCRIPT_TMPL"  > "$GNUPLOTSCRIPT"
 gnuplot < "$GNUPLOTSCRIPT"
 rm "$GNUPLOTSCRIPT"
 
@@ -140,7 +140,7 @@ CONVERT_OPTS_B="-interlace none -scale 800x600 -quality 100"
 
 for this in $files
 do
-   prefix=$(echo $this|perl -p -e's/\.\w+$//')
+   prefix=$(echo "$this"|perl -p -e's/\.\w+$//')
    convert "$CONVERT_OPTS_A" "$TEMPPATH/$this" "$HTMLPATH/${prefix}.png"
    convert "$CONVERT_OPTS_B" "$TEMPPATH/$this" "$HTMLPATH/${prefix}B.png"
    touch "$HTMLPATH/${prefix}.png" "$HTMLPATH/${prefix}B.png"
