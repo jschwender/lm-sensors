@@ -31,7 +31,7 @@
 
 PSENSORS=/usr/local/bin/sensors
 
-if [ ! -x $PSENSORS ]; then
+if [ ! -x "$PSENSORS" ]; then
 	PSENSORS=/usr/bin/sensors
 fi
 
@@ -45,8 +45,8 @@ prog="lm_sensors"
 # sensors are configured, and loads the config file
 check_sensors() {
 	CONFIG=/etc/sysconfig/lm_sensors
-	if ! [ -r "$CONFIG" ] || ! grep '^HWMON_MODULES' $CONFIG >/dev/null 2>&1; then
-		echo -n "$1 $prog: not configured, run sensors-detect"
+	if ! [ -r "$CONFIG" ] || ! grep '^HWMON_MODULES' "$CONFIG" >/dev/null 2>&1; then
+		printf "%s %s: not configured, run sensors-detect" "$1" "$prog"
 		echo_warning
 		echo
 		exit 6
@@ -59,16 +59,16 @@ check_sensors() {
 start() {
 	check_sensors "Starting"
 
-	echo -n "Starting $prog: loading module "
+	printf "Starting %s: loading module " "$prog"
 
 	for module in $BUS_MODULES $HWMON_MODULES ; do
-		echo -n "${module} "
-		/sbin/modprobe $module >/dev/null 2>&1
+		printf "%s " "${module}"
+		/sbin/modprobe "$module" >/dev/null 2>&1
 	done
-	$PSENSORS -s
+	"$PSENSORS" -s
 
 	RETVAL=$?
-	if [ $RETVAL -eq 0 ] && touch /var/lock/subsys/lm_sensors ; then
+	if [ "$RETVAL" -eq 0 ] && touch /var/lock/subsys/lm_sensors ; then
 		echo_success
 		echo
 	else
@@ -80,14 +80,14 @@ start() {
 stop() {
 	check_sensors "Stopping"
 
-	echo -n "Stopping $prog: "
+	printf "Stopping %s:" "$prog"
 
 	for module in $HWMON_MODULES $BUS_MODULES ; do
-		/sbin/modprobe -r $module >/dev/null 2>&1
+		/sbin/modprobe -r "$module" >/dev/null 2>&1
 	done
 
 	RETVAL=$?
-	if [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/lm_sensors ; then
+	if [ "$RETVAL" -eq 0 ] && rm -f /var/lock/subsys/lm_sensors ; then
 		echo_success
 		echo
 	else
@@ -99,7 +99,7 @@ stop() {
 dostatus() {
 	$PSENSORS
 	RETVAL=$?
-	if [ $RETVAL -ne 0 ]; then
+	if [ "$RETVAL" -ne 0 ]; then
 		RETVAL=3
 	fi
 }
@@ -135,4 +135,4 @@ case "$1" in
 	exit 3
 esac
 
-exit $RETVAL
+exit "$RETVAL"
