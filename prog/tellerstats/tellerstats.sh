@@ -111,7 +111,7 @@ fi
 
 # Trim files to 48 hour window
 
-cd "$DBPATH"
+cd "$DBPATH" || { echo "could not change directoty to $DBPATH"; exit 1; }
 files="$(echo *)"
 
 for this in $files
@@ -125,7 +125,7 @@ done
 rm -rf "$TEMPPATH"
 mkdir -p "$TEMPPATH"
 
-cd "$TEMPPATH"
+cd "$TEMPPATH" || { echo "could not change directoty to $TEMPPATH"; exit 1; }
 
 # Update primary plots
 GNUPLOTSCRIPT="$TEMPPATH/gnuplotscript"
