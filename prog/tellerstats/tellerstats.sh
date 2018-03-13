@@ -32,39 +32,39 @@ fi
 
 export TELLERSTATS_CONF
 
-if [ ! -r $TELLERSTATS_CONF ]
+if [ ! -r "$TELLERSTATS_CONF" ]
 then
    echo "$0: Could not find config file $TELLERSTATS_CONF"
    exit 1
 fi   
 
-. $TELLERSTATS_CONF
+. "$TELLERSTATS_CONF"
 
-if [ ! -d $DBPATH ]
+if [ ! -d "$DBPATH" ]
 then
    echo "$0: data directory $DBPATH does not exist"
    exit 1
 fi
 
-if [ ! -d $SENSORPATH ]
+if [ ! -d "$SENSORPATH" ]
 then
    echo "$0: sensor information directory $SENSORPATH does not exist."
    exit 1
 fi
 
-if [ ! -d $HTMLROOT ]
+if [ ! -d "$HTMLROOT" ]
 then
    echo "$0: The root of your webserver - $HTMLROOT - does not exist..bailing out"
    exit 1
 fi
 
-if [ ! -d $HTMLPATH ]
+if [ ! -d "$HTMLPATH" ]
 then
    echo "$0: The place where we keep HTML files and pictures - $HTMLPATH - does not exist..bailing out"
    exit 1
 fi
 
-if [ ! -r $GNUPLOTSCRIPT_TMPL ]
+if [ ! -r "$GNUPLOTSCRIPT_TMPL" ]
 then
    echo "$0: The gnuplot script template $GNUPLOTSCRIPT_TMPL does not exist..bailing out"
    exit 1
@@ -111,27 +111,27 @@ fi
 
 # Trim files to 48 hour window
 
-cd $DBPATH
+cd "$DBPATH"
 files="`echo *`"
 
 for this in $files
 do
-   tail $this -n576 > ${this}.tmp
-   mv ${this}.tmp $this
+   tail "$this" -n576 > "${this}.tmp"
+   mv "${this}.tmp" "$this"
 done
 
 ###############################################
 
-rm -rf $TEMPPATH
-mkdir -p $TEMPPATH
+rm -rf "$TEMPPATH"
+mkdir -p "$TEMPPATH"
 
-cd $TEMPPATH
+cd "$TEMPPATH"
 
 # Update primary plots
 GNUPLOTSCRIPT="$TEMPPATH/gnuplotscript"
-cat $GNUPLOTSCRIPT_TMPL | perl -p -e's/\$(\w+)/$ENV{$1}/g' > $GNUPLOTSCRIPT
-gnuplot < $GNUPLOTSCRIPT
-rm $GNUPLOTSCRIPT
+cat "$GNUPLOTSCRIPT_TMPL" | perl -p -e's/\$(\w+)/$ENV{$1}/g' > "$GNUPLOTSCRIPT"
+gnuplot < "$GNUPLOTSCRIPT"
+rm "$GNUPLOTSCRIPT"
 
 files="`echo *`"
 
@@ -141,14 +141,14 @@ CONVERT_OPTS_B="-interlace none -scale 800x600 -quality 100"
 for this in $files
 do
    prefix=`echo $this|perl -p -e's/\.\w+$//'`
-   convert $CONVERT_OPTS_A $TEMPPATH/$this $HTMLPATH/${prefix}.png
-   convert $CONVERT_OPTS_B $TEMPPATH/$this $HTMLPATH/${prefix}B.png
-   touch $HTMLPATH/${prefix}.png $HTMLPATH/${prefix}B.png
+   convert "$CONVERT_OPTS_A" "$TEMPPATH/$this" "$HTMLPATH/${prefix}.png"
+   convert "$CONVERT_OPTS_B" "$TEMPPATH/$this" "$HTMLPATH/${prefix}B.png"
+   touch "$HTMLPATH/${prefix}.png" "$HTMLPATH/${prefix}B.png"
 done
 
 # Update timestamp
 
-touch $HTMLPATH/index.shtml
+touch "$HTMLPATH/index.shtml"
 
 # if this was called as a cgi script, it should redirect to the index.shtml file
 if [ -n "$REMOTE_HOST" ]
@@ -160,7 +160,7 @@ fi
 
 if [ -z "$DEBUG" ]
 then
-   rm -rf $TEMPPATH
+   rm -rf "$TEMPPATH"
 fi   
 
 exit 0
