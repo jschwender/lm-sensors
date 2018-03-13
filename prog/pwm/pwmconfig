@@ -110,7 +110,7 @@ do
 	# Find available fan control outputs
 	MATCH=$device/'pwm[1-9]'
 	device_pwm=$(echo "$MATCH")
-	if [ "$SYSFS" = "1" -a "$MATCH" = "$device_pwm" ]
+	if [ "$SYSFS" = "1" ] && [ "$MATCH" = "$device_pwm" ]
 	then
 		# Deprecated naming scheme (used in kernels 2.6.5 to 2.6.9)
 		MATCH=$device/'fan[1-9]_pwm'
@@ -251,13 +251,13 @@ do
 			echo 'it is more efficient and it reacts faster. Are you sure that'
 			echo -n 'you want to setup this output for manual control? (n) '
 			read X
-			if [ "$X" = "" -o "$X" != "y" -a "$X" != "Y" ]
+			if [ "$X" = "" ] || [ "$X" != "y" ] && [ "$X" != "Y" ]
 			then
 				continue
 			fi
 		fi
 
-		pwmdisable $i
+		pwmdisable "$i"
 		if [ $? -ne 0 ]
 		then
 			echo "Manual control mode not supported, skipping $i."
@@ -285,7 +285,7 @@ echo 'Found the following fan sensors:'
 for i in $FAN
 do
 	S=$(cat "$i")
-	if [ "$S" = "0" -o "$S" = "-1" ]
+	if [ "$S" = "0" ] || [ "$S" = "-1" ]
 	then
 		echo "   $i     current speed: 0 ... skipping!"
 	else
@@ -338,7 +338,7 @@ function pwmdetail()
 	then
 		echo -n "Would you like to generate a graphical plot using $PLOTTER (y)? "
 		read X
-		if [ "$X" = "y" -o "$X" = "Y" -o "$X" = "" ]
+		if [ "$X" = "y" ] || [ "$X" = "Y" ] || [ "$X" = "" ]
 		then
 			PLOT=y
 		fi
@@ -352,7 +352,7 @@ function pwmdetail()
 	if [ "$PLOT" = "y" ]
 	then
 		TMP1=$(mktemp -t pwmtest1.XXXXXXXXXX) || { echo "$0: Cannot create temporary file" >&2; exit 1; }
-		TMP2=$(mktemp -t pwmtest2.XXXXXXXXXX) || { rm -f $TMP1 ; echo "$0: Cannot create temporary file" >&2; exit 1; }
+		TMP2=$(mktemp -t pwmtest2.XXXXXXXXXX) || { rm -f "$TMP1" ; echo "$0: Cannot create temporary file" >&2; exit 1; }
 		{
 		echo "set xlabel \"PWM: $P\""
 		echo "set ylabel \"FAN: $F (RPM)\""
@@ -391,7 +391,7 @@ function pwmdetail()
 		then
 			echo "$pwm $S" >> "$TMP2"
 		fi
-		if [ "$S" = "0" -o "$S" = "-1" ]
+		if [ "$S" = "0" ] || [ "$S" = "-1" ]
 		then
 			pwmdisable "$P"
 			echo "    Fan Stopped at PWM = $pwm"
@@ -492,7 +492,7 @@ do
 			else
 				echo -n "Would you like to generate a detailed correlation (y)? "
 				read X
-				if [ "$X" = "y" -o "$X" = "Y" -o "$X" = "" ]
+				if [ "$X" = "y" ] || [ "$X" = "Y" ] || [ "$X" = "" ]
 				then
 					pwmdetail "$i" "$j"
 				fi
@@ -514,7 +514,7 @@ do
 		echo
 		echo -n "Did you see/hear a fan stopping during the above test (n)? "
 		read X
-		if [ "$X" = "y" -o "$X" = "Y" ]
+		if [ "$X" = "y" ] || [ "$X" = "Y" ]
 		then
 			pwmactive="$i ${pwmactive}"
 			fanactive_min="0 $fanactive_min"
@@ -534,7 +534,7 @@ echo 'of your system by changing fanspeeds.'
 echo -n 'Do you want to set up its configuration file now (y)? '
 
 read X
-if [ "$X" = "n" -o "$X" = "N" ]
+if [ "$X" = "n" ] || [ "$X" = "N" ]
 then
 	exit
 fi
@@ -721,7 +721,7 @@ function TestMinStop()
 			break
 		else
 			echo "    PWM $fanval -> $fanspeed RPM"
-			if [ "$fanspeed" = "0" -o "$fanspeed" = "-1" ]
+			if [ "$fanspeed" = "0" ] || [ "$fanspeed" = "-1" ]
 			then
 				break
 			fi
@@ -764,7 +764,7 @@ function RememberDevices()
 			pwmdev=$(echo "$entry" | sed -e 's/\/.*$//')
 			tempfandev=$(echo "$entry" | sed -e 's/^[^=]*=//' -e 's/\/.*$//')
 
-			if [ "$device" = "$pwmdev" -o "$device" = "$tempfandev" ]
+			if [ "$device" = "$pwmdev" ] || [ "$device" = "$tempfandev" ]
 			then
 				used=1
 			fi
@@ -818,7 +818,7 @@ function SaveConfig()
 	echo "MINSTOP=$MINSTOP"
 	[ -n "$MINPWM" ] && echo "MINPWM=$MINPWM"
 	[ -n "$MAXPWM" ] && echo "MAXPWM=$MAXPWM"
-	} >$tmpfile
+	} >"$tmpfile"
 	mv "$tmpfile" "$FCCONFIG"
 	chmod +r "$FCCONFIG"
 	#check if file was written correctly
@@ -869,7 +869,7 @@ select pwms in $pwmactive "Change INTERVAL" "Just quit" "Save and quit" "Show co
 			echo "Settings of ${pwmo}:"
 			echo "  Depends on $(filter_cfgvar "$FCTEMPS" "$pwmo")"
 			echo "  Controls $(filter_cfgvar "$FCFANS" "$pwmo")"
-			echo "  MINTEMP=$(filter_cfgvar "$MINTEMP" $pwmo)"
+			echo "  MINTEMP=$(filter_cfgvar "$MINTEMP" "$pwmo")"
 			echo "  MAXTEMP=$(filter_cfgvar "$MAXTEMP" "$pwmo")"
 			echo "  MINSTART=$(filter_cfgvar "$MINSTART" "$pwmo")"
 			echo "  MINSTOP=$(filter_cfgvar "$MINSTOP" "$pwmo")"
@@ -954,7 +954,7 @@ select pwms in $pwmactive "Change INTERVAL" "Just quit" "Save and quit" "Show co
 				then
 					XMSTOP=$DEFMINSTOP
 				fi
-				if [ "$XMSTOP" = "t" -o "$XMSTOP" = "T" ]
+				if [ "$XMSTOP" = "t" ] || [ "$XMSTOP" = "T" ]
 				then
 					TestMinStop "$FAN"
 					XMSTOP=$fanval
@@ -980,7 +980,7 @@ select pwms in $pwmactive "Change INTERVAL" "Just quit" "Save and quit" "Show co
 				then
 					XMSTART=$DEFMINSTART
 				fi
-				if [ "$XMSTART" = "t" -o "$XMSTART" = "T" ]
+				if [ "$XMSTART" = "t" ] || [ "$XMSTART" = "T" ]
 				then
 					TestMinStart $XMSTOP
 					XMSTART=$fanval
