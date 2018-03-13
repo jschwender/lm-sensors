@@ -27,14 +27,14 @@ if [ "$UID" -ne 0 ] ; then
 	exit 252
 fi
 
-smbus=`lspci -n -s $device.3 | grep -i '0c05: *8086'`
+smbus=$(lspci -n -s $device.3 | grep -i '0c05: *8086')
 if [ -n "$smbus" ] ; then
 	echo "ICH SMBus is already there!"
 	lspci -s $device.3
 	exit
 fi
 
-intel=`lspci -n -s $device.0 | grep -i '8086:24[148CD][0C]'`
+intel=$(lspci -n -s $device.0 | grep -i '8086:24[148CD][0C]')
 if [ -z "$intel" ] ; then
 	echo "Not for your chipset - Intel (ICH) only"
 	echo "Supported: ICH, ICH2, ICH2-M, ICH3, ICH3-M, ICH4, ICH4-M, ICH5"
@@ -50,7 +50,7 @@ fi
 echo "Enabling SMBus PCI device ..."
 
 newval=$( printf '%x' $((0x$(setpci -s $device.0 f2.w) & 0xfff7))) 
-setpci -s $device.0 f2.w=$newval
+setpci -s "$device.0" f2.w="$newval"
 
 echo "Rescanning the bus ..."
 echo 1 > $pcibus/0000:$device.0/power 2>/dev/null
@@ -61,8 +61,7 @@ fi
 
 if [ ! -d "/sys/bus/pci/drivers/i801_smbus" ] ; then
 	echo "Loading i2c-i801 ..."
-	modprobe i2c-i801
-	if [ $? -ne 0 ] ; then
+	if modprobe i2c-i801 ; then
 		exit 251
 	fi
 fi
