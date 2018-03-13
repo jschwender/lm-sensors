@@ -42,7 +42,7 @@ usage()
 
 set_attr()
 {
-    read tmp < "$12"
+    read -r tmp < "$1"
     echo "echo $tmp > $1"
     echo "$2" > "$1"
 }
@@ -94,7 +94,7 @@ initfile="/root/.vt1211_pwm${nr}"
 # ACTION: display
 if [ "$action" = "display" ] ; then
     for nr in 1 2 ; do
-	read mode < "${dev}/pwm${nr}_enable"
+	read -r mode < "${dev}/pwm${nr}_enable"
 	if [ "$mode" -eq 0 ] ; then
 	    mode_txt="(disabled)"
 	elif [ "$mode" -eq 2 ] ; then
@@ -102,7 +102,7 @@ if [ "$action" = "display" ] ; then
 	else
 	    mode_txt="(unknown) "
 	fi
-	read val < "${dev}/pwm${nr}"
+	read -r val < "${dev}/pwm${nr}"
 	dc=$((val * 100 / 255))
 	echo "pwm${nr}: mode = ${mode} ${mode_txt}, val = ${val} (${dc}%)"
     done
@@ -170,7 +170,7 @@ if [ "$action" = "set" ] ; then
     echo 1000000 > "${dev}/pwm1_auto_point3_temp"
 
     # read the new PWM duty-cycle back and print it
-    read val < "${dev}/pwm${nr}"
+    read -r val < "${dev}/pwm${nr}"
     dc=$((val * 100 / 255))
     echo "pwm${nr} is now at ${val} (${dc}%)."
 
