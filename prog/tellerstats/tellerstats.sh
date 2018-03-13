@@ -112,7 +112,7 @@ fi
 # Trim files to 48 hour window
 
 cd "$DBPATH"
-files="`echo *`"
+files="$(echo *)"
 
 for this in $files
 do
@@ -133,14 +133,14 @@ cat "$GNUPLOTSCRIPT_TMPL" | perl -p -e's/\$(\w+)/$ENV{$1}/g' > "$GNUPLOTSCRIPT"
 gnuplot < "$GNUPLOTSCRIPT"
 rm "$GNUPLOTSCRIPT"
 
-files="`echo *`"
+files="$(echo *)"
 
 CONVERT_OPTS_A="-interlace none -scale 320x240 -quality 100"
 CONVERT_OPTS_B="-interlace none -scale 800x600 -quality 100"
 
 for this in $files
 do
-   prefix=`echo $this|perl -p -e's/\.\w+$//'`
+   prefix=$(echo $this|perl -p -e's/\.\w+$//')
    convert "$CONVERT_OPTS_A" "$TEMPPATH/$this" "$HTMLPATH/${prefix}.png"
    convert "$CONVERT_OPTS_B" "$TEMPPATH/$this" "$HTMLPATH/${prefix}B.png"
    touch "$HTMLPATH/${prefix}.png" "$HTMLPATH/${prefix}B.png"
